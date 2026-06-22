@@ -9,7 +9,7 @@
 | Campo | Detalle |
 |---|---|
 | **Estudiante** | Gisella Martinez y Hector Buitrago |
-| **Docente** | Yeison Taborda |
+| **Docente** | Yeis Taborda |
 | **Institución** | Especialización en Analítica de Datos — Facultad de Ingeniería — UNAULA |
 | **Período** | I - 2026 |
 | **Fecha** | 29 de junio de 2026 |
