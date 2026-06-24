@@ -12,7 +12,7 @@
 | **Docente** | Yeis Taborda |
 | **Institución** | Especialización en Analítica de Datos — Facultad de Ingeniería — UNAULA |
 | **Período** | I - 2026 |
-| **Fecha** | 29 de junio de 2026 |
+| **Fecha** | 26 de junio de 2026 |
 | **Dataset** | `Detalle_ventas_2024_2026.xlsx` — 179,075 registros — 48 columnas |
 | **Plataforma** | Databricks |
 | **Catálogo** | `ventas_duratex` |
