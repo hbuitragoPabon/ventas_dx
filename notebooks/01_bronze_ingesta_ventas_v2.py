@@ -1,17 +1,23 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "5"
+# ///
+# DBTITLE 1,Bronze Ingestion Header
 # MAGIC %md
 # MAGIC # 01 - BRONZE: Ingesta de Ventas Duratex
-# MAGIC 
+# MAGIC
 # MAGIC **Objetivo:** Leer el archivo Excel desde el volumen Unity Catalog y guardarlo en formato Delta Lake sin transformaciones, preservando el dato crudo.
-# MAGIC 
+# MAGIC
 # MAGIC **Arquitectura:** Medallón Bronze Layer
-# MAGIC 
+# MAGIC
 # MAGIC **Entrada:** `/Volumes/ventas_duratex/bronze/landing_zone/Detalle_ventas_2024_2026.xlsx`
-# MAGIC 
+# MAGIC
 # MAGIC **Salida:** `ventas_duratex.bronze.ventas_raw`
 
 # COMMAND ----------
 
+# DBTITLE 1,Configuration
 # CELDA 1 — Configuración inicial
 # Definir todas las constantes del notebook
 
@@ -29,6 +35,7 @@ print(f"Archivo fuente: {FILE_PATH}")
 
 # COMMAND ----------
 
+# DBTITLE 1,Verify File Exists
 # CELDA 2 — Verificar que el archivo existe en el volumen
 
 try:
@@ -51,11 +58,13 @@ except Exception as e:
 
 # COMMAND ----------
 
+# DBTITLE 1,Install openpyxl
 # Instalar openpyxl para leer archivos Excel
 %pip install openpyxl
 
 # COMMAND ----------
 
+# DBTITLE 1,Read Excel and Convert to Spark
 # CELDA 3 — Leer el Excel con pandas y convertir a Spark DataFrame
 # Usar pandas para leer Excel (formato nativo del ERP) y luego convertir a Spark
 
@@ -133,6 +142,7 @@ print(f"\n✓ DataFrame Spark creado exitosamente")
 
 # COMMAND ----------
 
+# DBTITLE 1,Show Schema and Sample
 # CELDA 4 — Mostrar el esquema y una muestra de datos
 
 print("ESQUEMA DEL DATAFRAME:")
@@ -146,6 +156,7 @@ display(df.limit(5))
 
 # COMMAND ----------
 
+# DBTITLE 1,Add Audit Columns
 # CELDA 5 — Agregar columnas de auditoría (sin modificar datos originales)
 
 from pyspark.sql.functions import current_timestamp, lit, current_date
@@ -172,6 +183,7 @@ display(df.select("NUMERO_FACTURA", "CLIENTE", "VLR_VENTA_NETA",
 
 # COMMAND ----------
 
+# DBTITLE 1,Save to Delta Lake
 # CELDA 6 — Guardar en Delta Lake (Bronze Layer)
 
 print(f"Guardando en Delta Lake: {CATALOG}.{SCHEMA}.{TABLE_NAME}")
@@ -196,6 +208,7 @@ print("-" * 80)
 
 # COMMAND ----------
 
+# DBTITLE 1,Post-Load Validation
 # CELDA 7 — Validación post-carga
 
 print("VALIDACIONES POST-CARGA")
@@ -249,6 +262,7 @@ print("=" * 80)
 
 # COMMAND ----------
 
+# DBTITLE 1,Descriptive Statistics
 # CELDA 8 — Estadísticas descriptivas de columnas clave
 
 print("ESTADÍSTICAS DESCRIPTIVAS - COLUMNAS FINANCIERAS")
@@ -278,19 +292,20 @@ print("-" * 80)
 
 # COMMAND ----------
 
+# DBTITLE 1,Documentation
 # MAGIC %md
 # MAGIC ---
 # MAGIC ## 📋 Documentación del Notebook
-# MAGIC 
+# MAGIC
 # MAGIC ### Descripción
 # MAGIC Este notebook implementa la **capa Bronze** de la arquitectura Medallón para el proyecto de ventas Duratex Colombia. Lee el archivo Excel crudo desde el volumen Unity Catalog y lo persiste en formato Delta Lake sin aplicar transformaciones, preservando la integridad del dato original.
-# MAGIC 
+# MAGIC
 # MAGIC ### Entrada
 # MAGIC * **Ruta:** `/Volumes/ventas_duratex/bronze/landing_zone/Detalle_ventas_2024_2026.xlsx`
 # MAGIC * **Formato:** Excel (.xlsx)
 # MAGIC * **Registros:** 179,075 filas
 # MAGIC * **Columnas:** 48 campos de datos + 3 de auditoría
-# MAGIC 
+# MAGIC
 # MAGIC ### Salida
 # MAGIC * **Tabla:** `ventas_duratex.bronze.ventas_raw`
 # MAGIC * **Formato:** Delta Lake
@@ -299,7 +314,7 @@ print("-" * 80)
 # MAGIC   - `_ingestion_timestamp`: Timestamp de carga
 # MAGIC   - `_source_file`: Nombre del archivo origen
 # MAGIC   - `_batch_id`: Identificador único del lote
-# MAGIC 
+# MAGIC
 # MAGIC ### Esquema Principal
 # MAGIC | Campo | Tipo | Descripción |
 # MAGIC |-------|------|-------------|
@@ -328,17 +343,17 @@ print("-" * 80)
 # MAGIC | COSTO_PROMEDIO | Double | Costo unitario |
 # MAGIC | Mercado | String | Tipo de mercado |
 # MAGIC | TIPO_CLIENTE | String | NAL (interno) o EXT (exportación) |
-# MAGIC 
+# MAGIC
 # MAGIC ### Validaciones Aplicadas
 # MAGIC 1. ✅ Conteo de registros: 179,075
 # MAGIC 2. ✅ Columnas de auditoría presentes
 # MAGIC 3. ✅ Particiones creadas correctamente (30 períodos)
 # MAGIC 4. ✅ Distribución por año verificada
 # MAGIC 5. ✅ Estadísticas descriptivas calculadas
-# MAGIC 
+# MAGIC
 # MAGIC ### Siguientes Pasos
 # MAGIC ➡️ Ejecutar `02_silver_limpieza_ventas` para aplicar transformaciones y enriquecimientos
-# MAGIC 
+# MAGIC
 # MAGIC ---
 # MAGIC **Proyecto:** Lakehouse Ventas Duratex Colombia  
 # MAGIC **Autor:** Data Engineering Team  

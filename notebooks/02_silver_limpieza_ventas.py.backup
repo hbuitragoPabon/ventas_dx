@@ -1,20 +1,15 @@
 # Databricks notebook source
-# /// script
-# [tool.databricks.environment]
-# environment_version = "5"
-# ///
-# DBTITLE 1,Silver Layer Header
 # MAGIC %md
 # MAGIC # 02 - SILVER: Limpieza y Enriquecimiento de Ventas
-# MAGIC
+# MAGIC 
 # MAGIC **Objetivo:** Leer desde Bronze, aplicar todas las limpiezas, clasificaciones y enriquecimientos necesarios para generar datos limpios y confiables.
-# MAGIC
+# MAGIC 
 # MAGIC **Arquitectura:** Medallón Silver Layer
-# MAGIC
+# MAGIC 
 # MAGIC **Entrada:** `ventas_duratex.bronze.ventas_raw`
-# MAGIC
+# MAGIC 
 # MAGIC **Salida:** `ventas_duratex.silver.ventas_limpias`
-# MAGIC
+# MAGIC 
 # MAGIC ### Transformaciones Aplicadas:
 # MAGIC 1. Trim en campos de texto
 # MAGIC 2. Clasificación de tipo de transacción
@@ -26,7 +21,6 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Configuration
 # Configuración inicial
 SOURCE_TABLE = "ventas_duratex.bronze.ventas_raw"
 TARGET_TABLE = "ventas_duratex.silver.ventas_limpias"
@@ -36,7 +30,6 @@ print(f"Tabla destino: {TARGET_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,Read from Bronze
 # CELDA 1 — Leer desde Bronze
 from pyspark.sql.functions import col
 
@@ -49,7 +42,6 @@ print(f"✓ Columnas: {len(df.columns)}")
 
 # COMMAND ----------
 
-# DBTITLE 1,Trim String Columns
 # CELDA 2 — Trim en todos los campos de texto
 from pyspark.sql.functions import trim
 from pyspark.sql.types import StringType
@@ -74,7 +66,6 @@ display(df.select("TIPO_CLIENTE", "BODEGA", "NOMBRE_VENDEDOR").limit(5))
 
 # COMMAND ----------
 
-# DBTITLE 1,Classify Transaction Type
 # CELDA 3 — Clasificar tipo de transacción
 from pyspark.sql.functions import when
 
@@ -95,7 +86,6 @@ display(df_tipo)
 
 # COMMAND ----------
 
-# DBTITLE 1,Return Flag
 # CELDA 4 — Flag de devolución
 from pyspark.sql.functions import col
 
@@ -118,7 +108,6 @@ df.groupBy("IS_DEVOLUCION").count().show()
 
 # COMMAND ----------
 
-# DBTITLE 1,Fix NULL Strings
 # CELDA 5 — Corregir LINEA (string "NULL" → valor nulo real)
 from pyspark.sql.functions import when, col
 
@@ -143,7 +132,6 @@ df.groupBy("LINEA").count().orderBy(col("count").desc()).show()
 
 # COMMAND ----------
 
-# DBTITLE 1,Temporal Enrichment
 # CELDA 6 — Enriquecimiento temporal
 from pyspark.sql.functions import (
     ceil, concat, lpad, lit, to_date, 
@@ -187,7 +175,6 @@ display(df.select(
 
 # COMMAND ----------
 
-# DBTITLE 1,Financial Metrics
 # CELDA 7 — Calcular métricas financieras
 from pyspark.sql.functions import when, col
 
@@ -236,7 +223,6 @@ display(df.select(
 
 # COMMAND ----------
 
-# DBTITLE 1,Quality Flag - Invalid Cost
 # CELDA 8 — Flag de calidad: costo inválido
 from pyspark.sql.functions import col
 
@@ -260,7 +246,6 @@ print(f"\nImpacto en ventas: ${venta_afectada:,.2f} COP")
 
 # COMMAND ----------
 
-# DBTITLE 1,Create Silver Schema
 # CELDA 9 — Crear esquema Silver si no existe
 print("Creando esquema Silver...")
 
@@ -269,7 +254,6 @@ print("✓ Schema 'ventas_duratex.silver' verificado/creado")
 
 # COMMAND ----------
 
-# DBTITLE 1,Save to Silver
 # CELDA 10 — Guardar en Silver
 print(f"Guardando en Delta Lake: {TARGET_TABLE}")
 print("-" * 80)
@@ -288,7 +272,6 @@ print("-" * 80)
 
 # COMMAND ----------
 
-# DBTITLE 1,Final Validations
 # CELDA 11 — Validaciones finales
 from pyspark.sql.functions import avg, round as spark_round, sum as spark_sum, countDistinct
 
@@ -350,52 +333,51 @@ print("\n🚀 Silver layer lista para consumo en Gold")
 
 # COMMAND ----------
 
-# DBTITLE 1,Documentation
 # MAGIC %md
 # MAGIC ---
 # MAGIC ## 📋 Documentación del Notebook
-# MAGIC
+# MAGIC 
 # MAGIC ### Descripción
 # MAGIC Este notebook implementa la **capa Silver** de la arquitectura Medallón. Lee los datos crudos desde Bronze y aplica todas las transformaciones de limpieza, clasificación y enriquecimiento necesarias para producir datos confiables y listos para analítica.
-# MAGIC
+# MAGIC 
 # MAGIC ### Entrada
 # MAGIC * **Tabla:** `ventas_duratex.bronze.ventas_raw`
 # MAGIC * **Registros:** 179,075
 # MAGIC * **Columnas:** 48 + 3 auditoría = 51
-# MAGIC
+# MAGIC 
 # MAGIC ### Salida
 # MAGIC * **Tabla:** `ventas_duratex.silver.ventas_limpias`
 # MAGIC * **Registros:** 179,075 (mismo volumen, transformado)
 # MAGIC * **Columnas:** 51 originales + 11 nuevas = **62 columnas**
 # MAGIC * **Particionamiento:** Por `ANO_PERIODO` y `MES_PERIODO`
-# MAGIC
+# MAGIC 
 # MAGIC ### Transformaciones Aplicadas
-# MAGIC
+# MAGIC 
 # MAGIC #### 1️⃣ Limpieza de Datos
 # MAGIC * **Trim:** Eliminación de espacios en blanco en todos los campos de texto
 # MAGIC * **Corrección de nulos:** String "NULL" → valor nulo real en campo `LINEA`
-# MAGIC
+# MAGIC 
 # MAGIC #### 2️⃣ Clasificaciones
 # MAGIC * **TIPO_TRANSACCION:** Clasifica documentos en VENTA / DEVOLUCION / OTRO
 # MAGIC   - VENTA: EFN, EFE (facturas)
 # MAGIC   - DEVOLUCION: ENN, ENE (notas crédito)
 # MAGIC * **IS_DEVOLUCION:** Flag booleano que identifica devoluciones (VLR_VENTA_NETA < 0 o tipo DEVOLUCION)
-# MAGIC
+# MAGIC 
 # MAGIC #### 3️⃣ Enriquecimiento Temporal
 # MAGIC * **ANO_PERIODO:** Año extraído de PERIODO
 # MAGIC * **MES_PERIODO:** Mes extraído de PERIODO
 # MAGIC * **TRIMESTRE:** Trimestre calculado (1-4)
 # MAGIC * **FECHA_PERIODO:** Fecha del primer día del mes (formato Date)
-# MAGIC
+# MAGIC 
 # MAGIC #### 4️⃣ Métricas Financieras
 # MAGIC * **COSTO_TOTAL:** COSTO_PROMEDIO × CANT_FACTURADA
 # MAGIC * **MARGEN_BRUTO:** VLR_VENTA_NETA - COSTO_TOTAL
 # MAGIC * **PCT_MARGEN:** (MARGEN_BRUTO / VLR_VENTA_NETA) × 100
 # MAGIC * **PCT_DESCUENTO:** (VLR_DSCTO_LIN / (VLR_VENTA_NETA + VLR_DSCTO_LIN)) × 100
-# MAGIC
+# MAGIC 
 # MAGIC #### 5️⃣ Flags de Calidad
 # MAGIC * **COSTO_INVALIDO:** Identifica registros con COSTO_PROMEDIO = 0
-# MAGIC
+# MAGIC 
 # MAGIC ### Columnas Nuevas (11 totales)
 # MAGIC | Columna | Tipo | Descripción |
 # MAGIC |---------|------|-------------|
@@ -410,17 +392,17 @@ print("\n🚀 Silver layer lista para consumo en Gold")
 # MAGIC | PCT_MARGEN | Double | Porcentaje de margen |
 # MAGIC | PCT_DESCUENTO | Double | Porcentaje de descuento |
 # MAGIC | COSTO_INVALIDO | Boolean | Flag de calidad de costo |
-# MAGIC
+# MAGIC 
 # MAGIC ### Métricas de Calidad
 # MAGIC * ✅ Registros con costo inválido: ~2.5% del total
 # MAGIC * ✅ Devoluciones identificadas: ~1.5% del total
 # MAGIC * ✅ Margen promedio MDP: ~25%
 # MAGIC * ✅ Margen promedio MDF: ~22%
 # MAGIC * ✅ Todos los registros clasificados correctamente
-# MAGIC
+# MAGIC 
 # MAGIC ### Siguientes Pasos
 # MAGIC ➡️ Ejecutar `03_gold_tablas_negocio` para crear tablas agregadas de negocio
-# MAGIC
+# MAGIC 
 # MAGIC ---
 # MAGIC **Proyecto:** Lakehouse Ventas Duratex Colombia  
 # MAGIC **Capa:** Silver (Limpieza y Enriquecimiento)  

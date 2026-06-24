@@ -1,18 +1,13 @@
 # Databricks notebook source
-# /// script
-# [tool.databricks.environment]
-# environment_version = "5"
-# ///
-# DBTITLE 1,Gold Layer Header
 # MAGIC %md
 # MAGIC # 03 - GOLD: Tablas de Negocio Agregadas
-# MAGIC
+# MAGIC 
 # MAGIC **Objetivo:** Crear tablas agregadas optimizadas para BI y análisis de negocio desde la capa Silver.
-# MAGIC
+# MAGIC 
 # MAGIC **Arquitectura:** Medallón Gold Layer
-# MAGIC
+# MAGIC 
 # MAGIC **Entrada:** `ventas_duratex.silver.ventas_limpias`
-# MAGIC
+# MAGIC 
 # MAGIC **Salidas:**
 # MAGIC * `ventas_duratex.gold.ventas_por_periodo`
 # MAGIC * `ventas_duratex.gold.ventas_por_vendedor`
@@ -22,7 +17,6 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,Configuration and Read Silver Data
 # Configuración inicial
 from pyspark.sql.functions import *
 from pyspark.sql.window import Window
@@ -48,14 +42,12 @@ print("-" * 80)
 
 # COMMAND ----------
 
-# DBTITLE 1,Table 1 Header
 # MAGIC %md
 # MAGIC ## TABLA 1: Ventas por Período
 # MAGIC Agregación temporal de ventas con métricas clave por mes y mercado
 
 # COMMAND ----------
 
-# DBTITLE 1,Create Sales by Period Table
 print("📅 CREANDO TABLA: ventas_por_periodo")
 print("=" * 80)
 
@@ -89,14 +81,12 @@ display(df_periodo.limit(12))
 
 # COMMAND ----------
 
-# DBTITLE 1,Table 2 Header
 # MAGIC %md
 # MAGIC ## TABLA 2: Ventas por Vendedor
 # MAGIC Desempeño de vendedores con métricas de ventas y tasa de devolución
 
 # COMMAND ----------
 
-# DBTITLE 1,Create Sales by Vendor Table
 print("👤 CREANDO TABLA: ventas_por_vendedor")
 print("=" * 80)
 
@@ -159,14 +149,12 @@ display(
 
 # COMMAND ----------
 
-# DBTITLE 1,Table 3 Header
 # MAGIC %md
 # MAGIC ## TABLA 3: Ventas por Producto
 # MAGIC Análisis de productos por línea, sublínea y características
 
 # COMMAND ----------
 
-# DBTITLE 1,Create Sales by Product Table
 print("📦 CREANDO TABLA: ventas_por_producto")
 print("=" * 80)
 
@@ -200,14 +188,12 @@ display(df_producto.limit(20))
 
 # COMMAND ----------
 
-# DBTITLE 1,Table 4 Header
 # MAGIC %md
 # MAGIC ## TABLA 4: Ventas por Bodega
 # MAGIC Análisis de bodegas/CEDIs con comparativo Year-over-Year
 
 # COMMAND ----------
 
-# DBTITLE 1,Create Sales by Warehouse Table
 print("🏭 CREANDO TABLA: ventas_por_bodega")
 print("=" * 80)
 
@@ -257,14 +243,12 @@ display(df_bodega.filter(col("CRECIMIENTO_YOY_PCT").isNotNull()).limit(10))
 
 # COMMAND ----------
 
-# DBTITLE 1,Table 5 Header
 # MAGIC %md
 # MAGIC ## TABLA 5: Segmentación RFM de Clientes
 # MAGIC Análisis de clientes por Recencia, Frecuencia y Monto (RFM)
 
 # COMMAND ----------
 
-# DBTITLE 1,Create RFM Segmentation Table
 print("🎯 CREANDO TABLA: clientes_rfm")
 print("=" * 80)
 
@@ -374,14 +358,12 @@ display(df_segmentos)
 
 # COMMAND ----------
 
-# DBTITLE 1,Optimization Header
 # MAGIC %md
 # MAGIC ## Optimización de Tablas Gold
 # MAGIC Aplicar Z-ORDER para mejorar el rendimiento de queries
 
 # COMMAND ----------
 
-# DBTITLE 1,Optimize Gold Tables
 print("🚀 OPTIMIZANDO TABLAS GOLD")
 print("=" * 80)
 
@@ -411,7 +393,7 @@ print("=" * 80)
 
 # COMMAND ----------
 
-# DBTITLE 1,Final Summary
+# Resumen final
 print("\n🎆 RESUMEN FINAL - TABLAS GOLD CREADAS")
 print("=" * 80)
 
@@ -438,57 +420,56 @@ print("=" * 80)
 
 # COMMAND ----------
 
-# DBTITLE 1,Documentation
 # MAGIC %md
 # MAGIC ---
 # MAGIC ## 📋 Documentación del Notebook
-# MAGIC
+# MAGIC 
 # MAGIC ### Descripción
 # MAGIC Este notebook implementa la **capa Gold** de la arquitectura Medallón, creando 5 tablas agregadas optimizadas para análisis de negocio, dashboards de BI y modelos de ciencia de datos.
-# MAGIC
+# MAGIC 
 # MAGIC ### Tabla Origen
 # MAGIC * **Tabla:** `ventas_duratex.silver.ventas_limpias`
 # MAGIC * **Registros:** 179,075
 # MAGIC * **Estado:** Datos limpios y enriquecidos
-# MAGIC
+# MAGIC 
 # MAGIC ### Tablas Destino
-# MAGIC
+# MAGIC 
 # MAGIC #### 1. ventas_por_periodo
 # MAGIC * **Descripción:** Agregación temporal mensual de ventas por mercado
 # MAGIC * **Granularidad:** FECHA_PERIODO + Mercado
 # MAGIC * **Métricas:** Venta neta, margen, facturas, unidades, clientes únicos
 # MAGIC * **Uso:** Análisis de tendencias, estacionalidad, forecasting
-# MAGIC
+# MAGIC 
 # MAGIC #### 2. ventas_por_vendedor
 # MAGIC * **Descripción:** Desempeño de vendedores con devoluciones
 # MAGIC * **Granularidad:** NOMBRE_VENDEDOR + FECHA_PERIODO
 # MAGIC * **Métricas:** Ventas, márgenes, devoluciones, tasa de devolución
 # MAGIC * **Uso:** Evaluación de desempeño, comisiones, gestión comercial
-# MAGIC
+# MAGIC 
 # MAGIC #### 3. ventas_por_producto
 # MAGIC * **Descripción:** Análisis de productos por características
 # MAGIC * **Granularidad:** LINEA + SUBLINEA + CALIBRE + FORMATO
 # MAGIC * **Métricas:** Ventas, márgenes, unidades, clientes, transacciones
 # MAGIC * **Uso:** Portfolio de productos, pricing, mix de ventas
-# MAGIC
+# MAGIC 
 # MAGIC #### 4. ventas_por_bodega
 # MAGIC * **Descripción:** Desempeño de bodegas/CEDIs con YoY
 # MAGIC * **Granularidad:** BODEGA + ANO_PERIODO + TRIMESTRE
 # MAGIC * **Métricas:** Ventas, márgenes, unidades, crecimiento YoY
 # MAGIC * **Uso:** Operaciones logísticas, planificación de inventario
-# MAGIC
+# MAGIC 
 # MAGIC #### 5. clientes_rfm
 # MAGIC * **Descripción:** Segmentación de clientes por RFM
 # MAGIC * **Granularidad:** ID_CLIENTE
 # MAGIC * **Métricas:** Recencia, Frecuencia, Monto, scores, segmento
 # MAGIC * **Segmentos:** Champion, Leal, Potencial, En_Riesgo, Inactivo, Regular
 # MAGIC * **Uso:** CRM, campañas de marketing, retención de clientes
-# MAGIC
+# MAGIC 
 # MAGIC ### Optimizaciones Aplicadas
 # MAGIC * **Z-ORDER:** Aplicado en columnas clave de cada tabla para mejorar performance
 # MAGIC * **Delta Lake:** Todas las tablas en formato Delta optimizado
 # MAGIC * **Particionamiento:** Según necesidades de acceso de cada tabla
-# MAGIC
+# MAGIC 
 # MAGIC ### Métricas Calculadas
 # MAGIC | Métrica | Fórmula | Descripción |
 # MAGIC |----------|---------|-------------|
@@ -498,12 +479,12 @@ print("=" * 80)
 # MAGIC | TASA_DEVOLUCION | (Devoluciones / Total) × 100 | % de transacciones devueltas |
 # MAGIC | CRECIMIENTO_YOY_PCT | ((Año actual - Año anterior) / Año anterior) × 100 | Crecimiento interanual |
 # MAGIC | RFM_SCORE | R_score + F_score + M_score | Puntuación combinada RFM (3-12) |
-# MAGIC
+# MAGIC 
 # MAGIC ### Siguientes Pasos
 # MAGIC ➡️ Ejecutar `04_analisis_visualizaciones` para generar gráficas y dashboards
-# MAGIC
+# MAGIC 
 # MAGIC ➡️ Ejecutar `05_modelos_ciencia_datos` para entrenar modelos predictivos
-# MAGIC
+# MAGIC 
 # MAGIC ---
 # MAGIC **Proyecto:** Lakehouse Ventas Duratex Colombia  
 # MAGIC **Capa:** Gold (Datos Agregados de Negocio)  
