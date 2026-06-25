@@ -91,6 +91,10 @@ ERP Duratex        Auto Loader   BRONZE → SILVER → GOLD   Databricks SQL
 | **Visualización** | Databricks SQL Dashboards + Power BI |
 | **ML/MLOps** | MLflow: tracking de experimentos, versionado, Serving Endpoints |
 
+
+<img width="1408" height="768" alt="image" src="https://github.com/user-attachments/assets/5d8754ce-903f-441f-94b9-5b0bd1591f4e" />
+
+
 ---
 
 ## 4. Pipeline de Ingesta de Datos
