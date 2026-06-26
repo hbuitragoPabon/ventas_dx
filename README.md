@@ -145,6 +145,33 @@ ERP Duratex        Auto Loader   BRONZE → SILVER → GOLD   Databricks SQL
 | 9 | Forecast de ventas | Modelo mensual por línea — proyección 6 meses |
 | 10 | Análisis de descuentos | `VLR_DSCTO_LIN / venta_bruta` = % descuento por vendedor |
 
+
+<img width="1014" height="480" alt="image" src="https://github.com/user-attachments/assets/5bb41e18-886e-425e-b6e5-52a8e9053f22" />
+
+<img width="990" height="673" alt="image" src="https://github.com/user-attachments/assets/0a07ff35-59cb-4529-96a1-ad9c5c5d0d7b" />
+
+<img width="996" height="683" alt="image" src="https://github.com/user-attachments/assets/68495743-8a22-4558-8cdc-a7b21fb24539" />
+
+<img width="1015" height="596" alt="image" src="https://github.com/user-attachments/assets/e9790ad0-2976-4b48-9ac5-17084a011581" />
+
+<img width="972" height="757" alt="image" src="https://github.com/user-attachments/assets/62d310d8-e562-4c86-9cf6-20ecda4fced9" />
+
+<img width="975" height="670" alt="image" src="https://github.com/user-attachments/assets/104c87a1-e081-4592-9b5e-8c3e7efe66ea" />
+
+<img width="981" height="753" alt="image" src="https://github.com/user-attachments/assets/b0d9c5e7-bccd-4fa1-874d-d9bcc458b429" />
+
+<img width="992" height="788" alt="image" src="https://github.com/user-attachments/assets/e4f6767e-768b-4d5a-9fe4-602201244721" />
+
+
+
+
+
+
+
+
+
+
+
 ### 4.4 Estrategia Medallón
 
 #### 🥉 CAPA BRONZE — Datos Crudos
